@@ -15,6 +15,7 @@ public class RestTemplateConfig {
         // ...
 
         RestTemplate restTemplate = new RestTemplate(clientHttpRequestFactory);
+
         return restTemplate;
     }
 }

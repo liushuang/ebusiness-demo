@@ -31,7 +31,8 @@ public class OrderService {
     private UserService userService;
 
     public Order getOrderById(Long orderId) {
-        return orderRepository.getOrderById(orderId);
+        Order order = orderRepository.getOrderById(orderId);
+        return order;
     }
 
     public OrderView getOrderView(Order order){

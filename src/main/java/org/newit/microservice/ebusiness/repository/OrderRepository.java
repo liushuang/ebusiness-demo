@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.newit.microservice.ebusiness.model.Order;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
@@ -16,8 +17,10 @@ public class OrderRepository {
     @Autowired
     private RestTemplate restTemplate;
 
+    @Cacheable(value = "order", key = "'order_' + #orderId")
     public Order getOrderById(Long orderId) {
-        return restTemplate.getForObject("http://localhost:19610/order/" + orderId, Order.class);
+        Order order = restTemplate.getForObject("http://localhost:19610/order/" + orderId, Order.class);
+        return order;
     }
 
     public void insert(Order order) {
