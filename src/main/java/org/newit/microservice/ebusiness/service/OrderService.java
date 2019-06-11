@@ -9,6 +9,7 @@ import com.google.common.collect.Lists;
 import org.newit.microservice.ebusiness.model.Item;
 import org.newit.microservice.ebusiness.model.Order;
 import org.newit.microservice.ebusiness.model.User;
+import org.newit.microservice.ebusiness.repository.OrderRepository;
 import org.newit.microservice.ebusiness.view.OrderView;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
@@ -21,7 +22,7 @@ import org.springframework.web.client.RestTemplate;
 public class OrderService {
 
     @Autowired
-    private RestTemplate restTemplate;
+    private OrderRepository orderRepository;
 
     @Autowired
     private ItemService itemService;
@@ -30,7 +31,7 @@ public class OrderService {
     private UserService userService;
 
     public Order getOrderById(Long orderId) {
-        return restTemplate.getForObject("http://localhost:19610/order/" + orderId, Order.class);
+        return orderRepository.getOrderById(orderId);
     }
 
     public OrderView getOrderView(Order order){
@@ -49,33 +50,15 @@ public class OrderService {
         order.setItemId(item.getId());
         order.setPrice(item.getPrice());
         order.setCreatedTime(Calendar.getInstance().getTime());
-        restTemplate.postForObject("http://localhost:19610/add/order",order,String.class);
+        orderRepository.insert(order);
     }
 
     public List<Order> getOrderListByBuyerId(long buyerId) {
-        ResponseEntity<List<Order>> responseEntity = restTemplate.exchange("http://localhost:19610/order/buyerList?buyerId=" + buyerId, HttpMethod.GET, null,
-                                                                      new ParameterizedTypeReference<List<Order>>() {});
-        List<Order> orderList = responseEntity.getBody();
-//        JSONArray result  =   restTemplate.getForObject("http://localhost:19610/order/buyerList?buyerId=" + buyerId, JSONArray.class);
-//        List<Order> orderList = Lists.newArrayList();
-//        for(int i = 0 ; i < result.size() ; i++){
-//            orderList.add(JSONObject.toJavaObject(result.getJSONObject(i), Order.class));
-//        }
-//        System.out.println(orderList);
-        return orderList;
+        return orderRepository.getOrderListByBuyerId(buyerId);
     }
 
     public List<Order> getOrderListBySellerId(long sellerId) {
-        ResponseEntity<List<Order>> responseEntity = restTemplate.exchange("http://localhost:19610/order/sellerList?sellerId=" + sellerId, HttpMethod.GET, null,
-                                                                           new ParameterizedTypeReference<List<Order>>() {});
-        List<Order> orderList = responseEntity.getBody();
-//        JSONArray result  =   restTemplate.getForObject("http://localhost:19610/order/sellerList?sellerId=" + sellerId, JSONArray.class);
-//        List<Order> orderList = Lists.newArrayList();
-//        for(int i = 0 ; i < result.size() ; i++){
-//            orderList.add(JSONObject.toJavaObject(result.getJSONObject(i), Order.class));
-//        }
-//        System.out.println(orderList);
-        return orderList;
+        return orderRepository.getOrderListBySellerId(sellerId);
     }
 
 }
