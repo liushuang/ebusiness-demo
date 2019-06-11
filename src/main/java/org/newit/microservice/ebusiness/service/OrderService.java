@@ -11,6 +11,9 @@ import org.newit.microservice.ebusiness.model.Order;
 import org.newit.microservice.ebusiness.model.User;
 import org.newit.microservice.ebusiness.view.OrderView;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -38,36 +41,40 @@ public class OrderService {
         orderView.setItem(itemService.getItemById(order.getItemId()));
         return orderView;
     }
-    public void createOrder(Long itemId, String username) {
+    public void createOrder(Long itemId, Long buyerId) {
         Item item = itemService.getItemById(itemId);
-        User currentUser = userService.getUserByName(username);
         Order order = new Order();
-        order.setBuyerId(currentUser.getId());
+        order.setBuyerId(buyerId);
         order.setSellerId(item.getSellerId());
         order.setItemId(item.getId());
         order.setPrice(item.getPrice());
         order.setCreatedTime(Calendar.getInstance().getTime());
-        String response = restTemplate.postForObject("http://localhost:19610/add/order",order,String.class);
-        System.out.println(response);
+        restTemplate.postForObject("http://localhost:19610/add/order",order,String.class);
     }
 
     public List<Order> getOrderListByBuyerId(long buyerId) {
-        JSONArray result  =   restTemplate.getForObject("http://localhost:19610/order/buyerList?buyerId=" + buyerId, JSONArray.class);
-        List<Order> orderList = Lists.newArrayList();
-        for(int i = 0 ; i < result.size() ; i++){
-            orderList.add(JSONObject.toJavaObject(result.getJSONObject(i), Order.class));
-        }
-        System.out.println(orderList);
+        ResponseEntity<List<Order>> responseEntity = restTemplate.exchange("http://localhost:19610/order/buyerList?buyerId=" + buyerId, HttpMethod.GET, null,
+                                                                      new ParameterizedTypeReference<List<Order>>() {});
+        List<Order> orderList = responseEntity.getBody();
+//        JSONArray result  =   restTemplate.getForObject("http://localhost:19610/order/buyerList?buyerId=" + buyerId, JSONArray.class);
+//        List<Order> orderList = Lists.newArrayList();
+//        for(int i = 0 ; i < result.size() ; i++){
+//            orderList.add(JSONObject.toJavaObject(result.getJSONObject(i), Order.class));
+//        }
+//        System.out.println(orderList);
         return orderList;
     }
 
     public List<Order> getOrderListBySellerId(long sellerId) {
-        JSONArray result  =   restTemplate.getForObject("http://localhost:19610/order/sellerList?sellerId=" + sellerId, JSONArray.class);
-        List<Order> orderList = Lists.newArrayList();
-        for(int i = 0 ; i < result.size() ; i++){
-            orderList.add(JSONObject.toJavaObject(result.getJSONObject(i), Order.class));
-        }
-        System.out.println(orderList);
+        ResponseEntity<List<Order>> responseEntity = restTemplate.exchange("http://localhost:19610/order/sellerList?sellerId=" + sellerId, HttpMethod.GET, null,
+                                                                           new ParameterizedTypeReference<List<Order>>() {});
+        List<Order> orderList = responseEntity.getBody();
+//        JSONArray result  =   restTemplate.getForObject("http://localhost:19610/order/sellerList?sellerId=" + sellerId, JSONArray.class);
+//        List<Order> orderList = Lists.newArrayList();
+//        for(int i = 0 ; i < result.size() ; i++){
+//            orderList.add(JSONObject.toJavaObject(result.getJSONObject(i), Order.class));
+//        }
+//        System.out.println(orderList);
         return orderList;
     }
 
