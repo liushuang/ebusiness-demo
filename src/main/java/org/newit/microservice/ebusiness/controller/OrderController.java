@@ -65,9 +65,8 @@ public class OrderController extends BaseController{
     @RequestMapping("/order/create")
     @ResponseBody
     public JSONObject createOrder(@RequestBody Item item) {
-        UserDetails userDetails =
-                (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        orderService.createOrder(item.getId(), userDetails.getUsername());
+        User user = getLoginUser();
+        orderService.createOrder(item.getId(), user.getId());
         JSONObject result = new JSONObject();
         result.put("success", true);
         return result;

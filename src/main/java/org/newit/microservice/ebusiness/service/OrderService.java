@@ -1,16 +1,22 @@
 package org.newit.microservice.ebusiness.service;
 
 import java.util.Calendar;
-import java.util.Collection;
 import java.util.List;
 
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
+import com.google.common.collect.Lists;
 import org.newit.microservice.ebusiness.model.Item;
 import org.newit.microservice.ebusiness.model.Order;
 import org.newit.microservice.ebusiness.model.User;
 import org.newit.microservice.ebusiness.repository.OrderRepository;
 import org.newit.microservice.ebusiness.view.OrderView;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
 @Service
 public class OrderService {
@@ -36,11 +42,10 @@ public class OrderService {
         orderView.setItem(itemService.getItemById(order.getItemId()));
         return orderView;
     }
-    public void createOrder(Long itemId, String username) {
+    public void createOrder(Long itemId, Long buyerId) {
         Item item = itemService.getItemById(itemId);
-        User currentUser = userService.getUserByName(username);
         Order order = new Order();
-        order.setBuyerId(currentUser.getId());
+        order.setBuyerId(buyerId);
         order.setSellerId(item.getSellerId());
         order.setItemId(item.getId());
         order.setPrice(item.getPrice());

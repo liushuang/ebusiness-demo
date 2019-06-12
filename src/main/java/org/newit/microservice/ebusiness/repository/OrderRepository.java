@@ -2,42 +2,46 @@ package org.newit.microservice.ebusiness.repository;
 
 import java.util.List;
 
-import org.apache.commons.collections4.CollectionUtils;
-import org.newit.microservice.ebusiness.dao.OrderMapper;
 import org.newit.microservice.ebusiness.model.Order;
-import org.newit.microservice.ebusiness.model.OrderExample;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Repository;
+import org.springframework.web.client.RestTemplate;
 
 @Repository
 public class OrderRepository {
 
     @Autowired
-    private OrderMapper orderMapper;
+    private RestTemplate restTemplate;
 
     public Order getOrderById(Long orderId) {
-        OrderExample example = new OrderExample();
-        example.createCriteria().andIdEqualTo(orderId);
-        List<Order> orders = orderMapper.selectByExample(example);
-        if (CollectionUtils.isNotEmpty(orders)) {
-            return orders.get(0);
-        }
-        return null;
+        return restTemplate.getForObject("http://localhost:19610/order/" + orderId, Order.class);
     }
 
     public void insert(Order order) {
-        orderMapper.insertSelective(order);
+        restTemplate.postForObject("http://localhost:19610/add/order",order,String.class);
     }
 
     public List<Order> getOrderListByBuyerId(long buyerId) {
-        OrderExample query = new OrderExample();
-        query.createCriteria().andBuyerIdEqualTo(buyerId);
-        return orderMapper.selectByExample(query);
+        ResponseEntity<List<Order>>
+                responseEntity = restTemplate.exchange("http://localhost:19610/order/buyerList?buyerId=" + buyerId, HttpMethod.GET, null,
+                                                       new ParameterizedTypeReference<List<Order>>() {});
+        List<Order> orderList = responseEntity.getBody();
+        return orderList;
     }
 
     public List<Order> getOrderListBySellerId(long sellerId) {
-        OrderExample query = new OrderExample();
-        query.createCriteria().andSellerIdEqualTo(sellerId);
-        return orderMapper.selectByExample(query);
+        ResponseEntity<List<Order>> responseEntity = restTemplate.exchange("http://localhost:19610/order/sellerList?sellerId=" + sellerId, HttpMethod.GET, null,
+                                                                           new ParameterizedTypeReference<List<Order>>() {});
+        List<Order> orderList = responseEntity.getBody();
+//        JSONArray result  =   restTemplate.getForObject("http://localhost:19610/order/sellerList?sellerId=" + sellerId, JSONArray.class);
+//        List<Order> orderList = Lists.newArrayList();
+//        for(int i = 0 ; i < result.size() ; i++){
+//            orderList.add(JSONObject.toJavaObject(result.getJSONObject(i), Order.class));
+//        }
+//        System.out.println(orderList);
+        return orderList;
     }
 }
