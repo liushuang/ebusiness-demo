@@ -3,6 +3,7 @@ package org.newit.microservice.ebusiness.service;
 import java.util.List;
 
 import org.newit.microservice.ebusiness.model.Item;
+import org.newit.microservice.ebusiness.model.ItemWithVisit;
 import org.newit.microservice.ebusiness.model.Order;
 import org.newit.microservice.ebusiness.repository.ItemRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +22,7 @@ public class ItemService {
     private ItemRepository itemRepository;
 
     public Item getItemById(long itemId) {
+        itemRepository.addItemVisit(itemId);
         return itemRepository.getItemById(itemId);
     }
 
@@ -30,5 +32,9 @@ public class ItemService {
 
     public List<Item> getItemAllList() {
         return itemRepository.getItemAllList();
+    }
+
+    public List<ItemWithVisit> getItemTopList() {
+        return itemRepository.getTopItemList();
     }
 }
