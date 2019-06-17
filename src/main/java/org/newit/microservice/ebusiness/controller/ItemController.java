@@ -3,6 +3,7 @@ package org.newit.microservice.ebusiness.controller;
 import java.util.List;
 
 import org.newit.microservice.ebusiness.model.Item;
+import org.newit.microservice.ebusiness.model.ItemWithVisit;
 import org.newit.microservice.ebusiness.service.ItemService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -47,5 +48,12 @@ public class ItemController extends BaseController{
         Item item = itemService.getItemById(itemId);
         model.addAttribute("item", item);
         return "item/itemDetail";
+    }
+
+    @RequestMapping("/item/topList")
+    public String itemTopList(Model model){
+        List<ItemWithVisit> itemWithVisit = itemService.getItemTopList();
+        model.addAttribute("itemWithVisitList", itemWithVisit);
+        return "item/topList";
     }
 }

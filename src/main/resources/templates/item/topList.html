@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head th:replace="common::commonHeader('Item List')"></head>
+<body>
+<div th:include="common::commonNav"></div>
+<h2>Item All List</h2>
+<table class="table">
+  <thead>
+  <tr>
+    <td>Id</td>
+    <td>name</td>
+    <td>description</td>
+    <td>price</td>
+    <td>visit</td>
+  </tr>
+  </thead>
+  <tbody>
+  <tr th:each="item:${itemWithVisitList}">
+    <td >
+      <a th:href="@{'/item/detail/' + ${item.item.id}}" th:text="${item.item.id}"></a>
+    </td>
+    <td th:text="${item.item.name}"></td>
+    <td th:text="${item.item.description}"></td>
+    <td th:text="${item.item.price}"></td>
+    <td th:text="${item.visit}"></td>
+  </tr>
+  </tbody>
+</table>
+<div th:include="common::commonFooter"></div>
+</body>
+</html>
