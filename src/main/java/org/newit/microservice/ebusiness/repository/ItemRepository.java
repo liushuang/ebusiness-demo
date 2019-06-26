@@ -23,6 +23,7 @@ import com.google.common.collect.Lists;
 @Repository
 public class ItemRepository {
 
+    private static final String ITEM_SERVICE_PREFIX= "http://item-service/";
     @Autowired
     private RedisTemplate redisTemplate;
 
@@ -31,19 +32,19 @@ public class ItemRepository {
 
     @Cacheable(value = "item", key = "'item_' + #itemId ")
     public Item getItemById(long itemId) {
-        Item item = restTemplate.getForObject("http://localhost:29610/item/" + itemId, Item.class);
+        Item item = restTemplate.getForObject(ITEM_SERVICE_PREFIX +"item/" + itemId, Item.class);
         return item;
     }
 
     @CachePut(value = "item", key = "'item_' + #itemId ")
     public Item insert(Item item) {
-        restTemplate.postForObject("http://localhost:29610/item/insert", item, JSONObject.class);
+        restTemplate.postForObject(ITEM_SERVICE_PREFIX + "item/insert", item, JSONObject.class);
         return item;
     }
 
     public List<Item> getItemAllList() {
         ResponseEntity<List<Item>>
-                responseEntity = restTemplate.exchange("http://localhost:29610/item/allList", HttpMethod.GET, null,
+                responseEntity = restTemplate.exchange(ITEM_SERVICE_PREFIX + "item/allList", HttpMethod.GET, null,
                                                        new ParameterizedTypeReference<List<Item>>() {});
         List<Item> itemList = responseEntity.getBody();
         return itemList;

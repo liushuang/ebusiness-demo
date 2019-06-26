@@ -16,17 +16,18 @@ public class OrderRepository {
     @Autowired
     private RestTemplate restTemplate;
 
+    private static String ORDER_PREFIX = "http://order-service/";
     public Order getOrderById(Long orderId) {
-        return restTemplate.getForObject("http://localhost:19610/order/" + orderId, Order.class);
+        return restTemplate.getForObject(ORDER_PREFIX + "order/" + orderId, Order.class);
     }
 
     public void insert(Order order) {
-        restTemplate.postForObject("http://localhost:19610/add/order",order,String.class);
+        restTemplate.postForObject(ORDER_PREFIX +"19610/add/order",order,String.class);
     }
 
     public List<Order> getOrderListByBuyerId(long buyerId) {
         ResponseEntity<List<Order>>
-                responseEntity = restTemplate.exchange("http://localhost:19610/order/buyerList?buyerId=" + buyerId, HttpMethod.GET, null,
+                responseEntity = restTemplate.exchange(ORDER_PREFIX +"order/buyerList?buyerId=" + buyerId, HttpMethod.GET, null,
                                                        new ParameterizedTypeReference<List<Order>>() {});
         List<Order> orderList = responseEntity.getBody();
         return orderList;
