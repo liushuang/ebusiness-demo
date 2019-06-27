@@ -4,6 +4,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
+import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
+import com.netflix.hystrix.contrib.javanica.annotation.HystrixProperty;
+import com.netflix.hystrix.exception.HystrixBadRequestException;
 import org.newit.microservice.ebusiness.model.Item;
 import org.newit.microservice.ebusiness.model.ItemWithVisit;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,9 +33,25 @@ public class ItemRepository {
     @Autowired
     private RestTemplate restTemplate;
 
-    @Cacheable(value = "item", key = "'item_' + #itemId ")
+//    @Cacheable(value = "item", key = "'item_' + #itemId ")
+    @HystrixCommand(fallbackMethod = "getItemFallback",
+            commandProperties={
+            @HystrixProperty(name="circuitBreaker.requestVolumeThreshold", value = "2")
+            }
+    )
     public Item getItemById(long itemId) {
-        Item item = restTemplate.getForObject(ITEM_SERVICE_PREFIX +"item/" + itemId, Item.class);
+        try {
+            Item item = restTemplate.getForObject(ITEM_SERVICE_PREFIX + "item/" + itemId, Item.class);
+            return item;
+        }catch (Exception e){
+            e.printStackTrace();
+            throw new HystrixBadRequestException("get item by id fail");
+        }
+    }
+
+    public Item getItemFallback(long itemId){
+        Item item = new Item();
+        item.setName("fallback item");
         return item;
     }
 

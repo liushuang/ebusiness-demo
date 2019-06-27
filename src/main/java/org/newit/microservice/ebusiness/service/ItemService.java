@@ -1,7 +1,9 @@
 package org.newit.microservice.ebusiness.service;
 
 import java.util.List;
+import java.util.Map;
 
+import com.google.common.collect.Maps;
 import org.newit.microservice.ebusiness.model.Item;
 import org.newit.microservice.ebusiness.model.ItemWithVisit;
 import org.newit.microservice.ebusiness.model.Order;
@@ -32,11 +34,19 @@ public class ItemService {
     }
 
     public void insert(Item item) {
-        itemRepository.insert(item);
+//
+//        itemRepository.insert(item);
+        itemFeignClient.insert(item);
     }
 
+
     public List<Item> getItemAllList() {
-        return itemRepository.getItemAllList();
+//        return itemRepository.getItemAllList();
+        Map<String, Object> map = Maps.newHashMap();
+        map.put("start",2);
+        map.put("limit",2);
+        map.put("param3", "from new it");
+        return itemFeignClient.itemAllList(map);
     }
 
     public List<ItemWithVisit> getItemTopList() {
